@@ -43,7 +43,7 @@ jobs:
         - cd $TRAVIS_BUILD_DIR && ./mvnw docker:stop docker:remove
         - cd $TRAVIS_BUILD_DIR && ./mvnw
         #- k3d i --name k3s daggerok/k8s-mp-services-learn,daggerok/k8s-mp-services-backend || echo 'oops....'
-        - k3d import-images --name k3s daggerok/k8s-mp-services-learn || echo 'oops....'
+        - k3d import-images --name k3s daggerok/k8s-mp-services-learn || echo oops....
         #
         - export KUBECONFIG="$(k3d get-kubeconfig --name='k3s')"
         - |
@@ -68,14 +68,15 @@ jobs:
         - http :/learn
         - http :30000/learn
         #
-        - cd $TRAVIS_BUILD_DIR && kubectl delete -f k8s/ -f k8s/ingress/  || echo 'cannot kubectl...'
-        - k3d stop --name=k3s -a                                          || echo 'cannot k3d...'
-        - docker rm -f -v `docker ps -q`                                  || echo 'cannot docker...'
-        - cat ~/.config/k3d/k3s/kubeconfig.yaml                           || echo 'cannot cat...'
+        - cd $TRAVIS_BUILD_DIR && kubectl delete -f k8s/ -f k8s/ingress/  || echo cannot kubectl...
+        - k3d stop --name=k3s -a                                          || echo cannot k3d...
+        - docker rm -f -v `docker ps -q`                                  || echo cannot docker...
+        - cat ~/.config/k3d/k3s/kubeconfig.yaml                           || echo cannot cat...
         - rm -rf ~/.config/k3d/k3s
     - stage: test
       name: learn fabric8
       before_script:
+        - docker network create k8s-mp-services || echo network already exists...
         - cd $TRAVIS_BUILD_DIR && ./mvnw
         - cd $TRAVIS_BUILD_DIR && ./mvnw docker:start
       script:
