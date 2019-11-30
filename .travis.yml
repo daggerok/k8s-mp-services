@@ -67,7 +67,6 @@ jobs:
         - http :/
         - http :/learn
         - http :30000/learn
-        - http :30000/
         #
         - cd $TRAVIS_BUILD_DIR && kubectl delete -f k8s/ -f k8s/ingress/  || echo 'cannot kubectl...'
         - k3d stop --name=k3s -a                                          || echo 'cannot k3d...'
@@ -80,8 +79,8 @@ jobs:
         - cd $TRAVIS_BUILD_DIR && ./mvnw
         - cd $TRAVIS_BUILD_DIR && ./mvnw docker:start
       script:
-        - http :8000/learn
         - http :8000
+        - http :8000/learn
       after_script:
         - cd $TRAVIS_BUILD_DIR && ./mvnw docker:stop docker:remove
     - stage: test
@@ -91,8 +90,8 @@ jobs:
         - java -jar $TRAVIS_BUILD_DIR/learn/target/*-runner.jar &
         - wait_for 8000
       script:
-        - http :8000/learn
         - http :8000
+        - http :8000/learn
       after_script:
         - stop_any 80 8000
     - stage: test
