@@ -22,18 +22,18 @@
         document.addEventListener('DOMContentLoaded', function (evt) {
             var getCentered = function getCentered() {
                 return document.querySelector(".centered");
-            }
+            };
             var mapper = function mapper(response) {
                 return 200 == response.status ? response.json(): { message: "Oops... Hello?" };
-            }
+            };
             var render = function render(json) {
                 console.log(json);
                 var div = getCentered();
                 div.textContent = json.message;
-            }
+            };
             var fallback = function fallback(reason) {
                 console.log("oops,", reason);
-            }
+            };
             var options = {
                 method: "GET",
                 mode: "cors",
@@ -47,7 +47,7 @@
                     .catch(fallback)
                     .then(mapper)
                     .then(render);
-            }
+            };
             var centered = getCentered();
             if (!!centered) centered.addEventListener("click", getMessage, false);
             getMessage();

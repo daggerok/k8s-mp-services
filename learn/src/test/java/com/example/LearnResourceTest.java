@@ -7,7 +7,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.containsStringIgnoringCase;
 
 @QuarkusTest
-public class ExampleResourceTest {
+public class LearnResourceTest {
 
     @Test
     public void testHelloEndpoint() {
