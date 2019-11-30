@@ -1,0 +1,57 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: learn
+  labels:
+    app: learn
+spec:
+  replicas: 2
+  template:
+    metadata:
+      name: learn
+      labels:
+        app: learn
+    spec:
+      containers:
+        - name: learn
+          image: daggerok/k8s-mp-services-learn
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+              protocol: TCP
+              name: "http"
+          readinessProbe:
+            httpGet:
+              scheme: HTTP
+              port: 8000
+              path: /health/ready
+          livenessProbe:
+            httpGet:
+              scheme: HTTP
+              port: 8000
+              path: /health/live
+#          env:
+#            - name: BACKEND_HOST
+#              value: "backend"
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: learn
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: learn
+spec:
+  selector:
+    app: learn
+  sessionAffinity: None
+  ports:
+    - port: 8000
+      protocol: TCP
+      name: "http"
+      targetPort: 8000
+      nodePort: 30000
+  type: NodePort
+---

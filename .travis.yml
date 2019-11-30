@@ -30,7 +30,16 @@ before_install:
   - pip install --user --upgrade httpie
 jobs:
   include:
-#    - stage: test
+    - stage: test
+      name: learn test
+      before_script:
+        - cd $TRAVIS_BUILD_DIR && ./mvnw -f learn clean compile quarkus:build
+        - java -jar $TRAVIS_BUILD_DIR/learn/target/*-runner.jar &
+        - wait_for 8000
+        - http :8000/learn
+        - http :8000
+        - stop_any 80 8000
+    #    - stage: test
 #      name: native k8s ingress using k3d k3s traefik
 #      script:
 #        - cd $TRAVIS_BUILD_DIR
@@ -42,7 +51,7 @@ jobs:
 #        - cd $TRAVIS_BUILD_DIR && ./mvnw -Pfabric8-native docker:stop docker:remove
 #        - cd $TRAVIS_BUILD_DIR && ./mvnw -Pfabric8-jvm docker:stop docker:remove
 #        - cd $TRAVIS_BUILD_DIR && ./mvnw -Pfabric8-native docker:build
-#        - k3d i --name k3s daggerok/k8s-mp-services-frontend,daggerok/k8s-mp-services-backend || echo 'oops....'
+#        - k3d i --name k3s daggerok/k8s-mp-services-learn,daggerok/k8s-mp-services-backend || echo 'oops....'
 #        #
 #        - export KUBECONFIG="$(k3d get-kubeconfig --name='k3s')"
 #        - |

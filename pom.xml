@@ -6,8 +6,11 @@
     <groupId>com.github.daggerok.quarkus</groupId>
     <artifactId>k8s-mp-services</artifactId>
     <name>${project.artifactId}</name>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
+    <modules>
+        <module>learn</module>
+    </modules>
     <properties>
         <encoding>UTF-8</encoding>
         <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
