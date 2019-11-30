@@ -22,10 +22,11 @@
         <docker-maven-plugin.version>0.31.0</docker-maven-plugin.version>
         <lombok.version>1.18.10</lombok.version>
         <logback.version>1.2.3</logback.version>
-        <port>8080</port><!-- change me in sub modules! -->
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
+        <dockerfile.location>Dockerfile</dockerfile.location><!-- change me in sub modules! -->
+        <port>8080</port><!-- change me in sub modules! -->
     </properties>
     <dependencyManagement>
 
@@ -66,6 +67,7 @@
                         <goals>
                             <goal>build</goal>
                         </goals>
+                        <phase>package</phase>
                     </execution>
                 </executions>
                 <configuration>
@@ -82,64 +84,48 @@
                     <removeVolumes>true</removeVolumes>
                     <imagePullPolicy>IfNotPresent</imagePullPolicy>
                     <autoCreateCustomNetworks>false</autoCreateCustomNetworks>
+                    <images>
+                        <image>
+                            <name>daggerok/${project.parent.artifactId}-${project.artifactId}</name>
+                            <alias>${project.artifactId}</alias>
+                            <build>
+                                <tags>
+                                    <tag>latest</tag>
+                                    <tag>${project.version}</tag>
+                                </tags>
+                                <contextDir>${maven.multiModuleProjectDirectory}/${project.artifactId}</contextDir>
+                                <dockerFile>${maven.multiModuleProjectDirectory}/${project.artifactId}/${dockerfile.location}</dockerFile>
+                            </build>
+                            <run>
+                                <network>
+                                    <mode>custom</mode>
+                                    <name>${project.parent.artifactId}</name>
+                                    <alias>${project.artifactId}</alias>
+                                    <alias>${project.parent.artifactId}.${project.artifactId}</alias>
+                                </network>
+                                <imagePullPolicy>Never</imagePullPolicy>
+                                <hostname>${project.artifactId}</hostname>
+                                <env>
+                                    <JAVA_OPTS/>
+                                    <BACKEND_HOST>backend</BACKEND_HOST>
+                                </env>
+                                <ports>
+                                    <port>${port}:${port}</port>
+                                </ports>
+                                <wait>
+                                    <http>
+                                        <url>http://127.0.0.1:${port}/health</url>
+                                        <status>200..299</status>
+                                        <method>GET</method>
+                                    </http>
+                                    <!--<log>Listening on: http</log>-->
+                                    <time>60000</time>
+                                </wait>
+                            </run>
+                        </image>
+                    </images>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-    <profiles>
-        <profile>
-            <id>fabric8</id>
-            <build>
-                <defaultGoal>clean compile quarkus:build docker:build</defaultGoal>
-                <plugins>
-                    <plugin>
-                        <groupId>io.fabric8</groupId>
-                        <artifactId>docker-maven-plugin</artifactId>
-                        <version>${docker-maven-plugin.version}</version>
-                        <configuration>
-                            <images>
-                                <image>
-                                    <name>daggerok/${project.parent.artifactId}-${project.artifactId}</name>
-                                    <alias>${project.artifactId}</alias>
-                                    <build>
-                                        <tags>
-                                            <tag>latest</tag>
-                                            <tag>latest-jvm</tag>
-                                            <tag>${project.version}</tag>
-                                            <tag>${project.version}-jvm</tag>
-                                        </tags>
-                                        <contextDir>${maven.multiModuleProjectDirectory}/${project.artifactId}
-                                        </contextDir>
-                                        <dockerFile>
-                                            ${maven.multiModuleProjectDirectory}/${project.artifactId}/Dockerfile
-                                        </dockerFile>
-                                    </build>
-                                    <run>
-                                        <network>
-                                            <mode>custom</mode>
-                                            <name>k8s-mp-services</name>
-                                            <alias>${project.artifactId}</alias>
-                                        </network>
-                                        <imagePullPolicy>Never</imagePullPolicy>
-                                        <hostname>${project.artifactId}</hostname>
-                                        <env>
-                                            <JAVA_OPTS/>
-                                            <BACKEND_HOST>backend</BACKEND_HOST>
-                                        </env>
-                                        <ports>
-                                            <port>${port}:${port}</port>
-                                        </ports>
-                                        <wait>
-                                            <log>Listening on: http</log>
-                                            <time>60000</time>
-                                        </wait>
-                                    </run>
-                                </image>
-                            </images>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>

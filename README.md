@@ -17,6 +17,11 @@ MicroProfile in k8s
 
 requires: `docker network create k8s-mp-services || echo oops`
 
+```bash
+./mvnw -f learn
+./mvnw docker:start
+```
+
 <!--
 
 ### jvm

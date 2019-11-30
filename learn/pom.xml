@@ -12,17 +12,14 @@
     <artifactId>learn</artifactId>
     <packaging>jar</packaging>
     <properties>
-        <compiler-plugin.version>3.8.1</compiler-plugin.version>
-        <maven.compiler.parameters>true</maven.compiler.parameters>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <quarkus-plugin.version>1.0.1.Final</quarkus-plugin.version>
+        <compiler-plugin.version>${maven-compiler-plugin.version}</compiler-plugin.version>
+        <surefire-plugin.version>${maven-surefire-plugin.version}</surefire-plugin.version>
         <quarkus.platform.artifact-id>quarkus-universe-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
         <quarkus.platform.version>1.0.1.Final</quarkus.platform.version>
-        <surefire-plugin.version>2.22.1</surefire-plugin.version>
+        <quarkus-plugin.version>1.0.1.Final</quarkus-plugin.version>
+        <dockerfile.location>src/main/docker/Dockerfile.jvm</dockerfile.location>
+        <port>8000</port>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -102,6 +99,13 @@
                     </systemProperties>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <configuration>
+                    <skip>false</skip>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <profiles>
@@ -125,18 +129,24 @@
                                 </goals>
                                 <configuration>
                                     <systemProperties>
-                                        <native.image.path>
-                                            ${project.build.directory}/${project.build.finalName}-runner
-                                        </native.image.path>
+                                        <native.image.path>${project.build.directory}/${project.build.finalName}-runner</native.image.path>
                                     </systemProperties>
                                 </configuration>
                             </execution>
                         </executions>
                     </plugin>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <configuration>
+                            <skip>false</skip>
+                        </configuration>
+                    </plugin>
                 </plugins>
             </build>
             <properties>
                 <quarkus.package.type>native</quarkus.package.type>
+                <dockerfile.location>src/main/docker/Dockerfile.native</dockerfile.location>
             </properties>
         </profile>
     </profiles>

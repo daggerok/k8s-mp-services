@@ -1,0 +1,54 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  labels:
+    app: backend
+spec:
+  replicas: 2
+  template:
+    metadata:
+      name: backend
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: daggerok/k8s-mp-services-backend
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8081
+              protocol: TCP
+              name: "http"
+          readinessProbe:
+            httpGet:
+              scheme: HTTP
+              port: 8081
+              path: /health/ready
+          livenessProbe:
+            httpGet:
+              scheme: HTTP
+              port: 8081
+              path: /health/live
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: backend
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+spec:
+  selector:
+    app: backend
+  sessionAffinity: None
+  ports:
+    - port: 8081
+      protocol: TCP
+      name: "http"
+      targetPort: 8081
+      nodePort: 30081
+  type: NodePort
+---
